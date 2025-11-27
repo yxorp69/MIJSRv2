@@ -5,7 +5,7 @@
   const SIDEBAR_CSS = `${BASE_URL}/sidebar.css`;
   const APPS_JSON = `${BASE_URL}/apps/apps.json`;
 
-  // Load external CSS into the document
+  // Load external CSS
   function loadCSS(href) {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -14,7 +14,7 @@
     document.head.appendChild(link);
   }
 
-  // Create a resizable horizontal sidebar
+  // Sidebar creation
   function createSidebar() {
     const sidebar = document.createElement('div');
     sidebar.id = 'mijsr-sidebar';
@@ -25,7 +25,7 @@
       height: 100%;
       max-width: 400px;
       min-width: 200px;
-      width: 300px;
+      width: ${localStorage.getItem('mijsr-width') || '300px'};
       background-color: #f5f5f5;
       border-right: 1px solid #ccc;
       box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -63,6 +63,7 @@
       const newWidth = startWidth + (e.clientX - startX);
       if (newWidth >= 200 && newWidth <= 400) {
         sidebar.style.width = `${newWidth}px`;
+        localStorage.setItem('mijsr-width', `${newWidth}px`);
       }
     }
 
@@ -72,7 +73,7 @@
     }
   }
 
-  // Create tabs with dynamic rendering for each section
+  // Tabs
   function createTabs() {
     const tabs = ['Code', 'Apps', 'Console', 'Settings'];
     const tabsContainer = document.createElement('div');
@@ -104,32 +105,25 @@
     content.insertAdjacentHTML('beforeend', `<div id="mijsr-tab-content"></div>`);
   }
 
-  // Event handler to activate and render content for each tab
+  // Tab activation
   function activateTab(tabName) {
     const contentArea = document.querySelector('#mijsr-tab-content');
     contentArea.innerHTML = '';
     switch (tabName) {
-      case 'Code':
-        renderCodeTab(contentArea);
-        break;
-      case 'Apps':
-        renderAppsTab(contentArea);
-        break;
-      case 'Console':
-        renderConsoleTab(contentArea);
-        break;
-      case 'Settings':
-        renderSettingsTab(contentArea);
-        break;
-      default:
-        console.log(`Unknown tab: ${tabName}`);
+      case 'Code': renderCodeTab(contentArea); break;
+      case 'Apps': renderAppsTab(contentArea); break;
+      case 'Console': renderConsoleTab(contentArea); break;
+      case 'Settings': renderSettingsTab(contentArea); break;
+      default: console.log(`Unknown tab: ${tabName}`);
     }
   }
 
+  // Code Tab
   function renderCodeTab(container) {
     container.innerHTML = `
-      <textarea id="mijsr-code-input" placeholder="Write your JavaScript here" style="width: 100%; height: 100%;"></textarea>
+      <textarea id="mijsr-code-input" placeholder="Write your JavaScript here" style="width: 100%; height: 80%;"></textarea>
       <input type="file" id="mijsr-code-file" />
+      <button id="mijsr-run-code">Run Code</button>
     `;
 
     const fileInput = container.querySelector('#mijsr-code-file');
@@ -138,66 +132,105 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
-          const codeArea = container.querySelector('#mijsr-code-input');
-          codeArea.value = event.target.result;
+          container.querySelector('#mijsr-code-input').value = event.target.result;
         };
         reader.readAsText(file);
       }
     });
+
+    container.querySelector('#mijsr-run-code').addEventListener('click', () => {
+      try {
+        const code = container.querySelector('#mijsr-code-input').value;
+        new Function(code)();
+      } catch (err) {
+        console.error(err);
+      }
+    });
   }
 
+  // Apps Tab
   async function renderAppsTab(container) {
     try {
       const response = await fetch(APPS_JSON);
       const apps = await response.json();
-      container.innerHTML = apps
-        .map(
-          (app) => `
+      container.innerHTML = apps.map(app => `
         <div class="mijsr-app">
           <strong>${app.name}</strong>
           <p>${app.description}</p>
-          <button onclick="loadApp('${app.url}')">Run</button>
+          <button onclick="window.mijsrLoadApp('${app.url}')">Run</button>
         </div>
-      `
-        )
-        .join('');
+      `).join('');
     } catch (error) {
       container.innerText = 'Error loading apps.json';
       console.error(error);
     }
   }
 
+  window.mijsrLoadApp = function(url) {
+    const script = document.createElement('script');
+    script.src = url;
+    document.body.appendChild(script);
+  };
+
+  // Console Tab
   function renderConsoleTab(container) {
     container.innerHTML = `
       <div id="mijsr-console-logs" style="height: 80%; overflow: auto; background: #333; color: #fff; padding: 5px;"></div>
       <label><input type="checkbox" id="mijsr-capture-all" /> Capture all logs</label>
-      <div id="mijsr-log-filters"></div>
+      <div>
+        <label><input type="checkbox" id="mijsr-filter-error" checked /> ERROR</label>
+        <label><input type="checkbox" id="mijsr-filter-warn" checked /> WARN</label>
+        <label><input type="checkbox" id="mijsr-filter-info" checked /> INFO</label>
+        <label><input type="checkbox" id="mijsr-filter-log" checked /> LOG</label>
+      </div>
     `;
 
     const logContainer = container.querySelector('#mijsr-console-logs');
-    console.log = (msg) => {
-      const timestamp = new Date().toLocaleTimeString();
-      logContainer.innerHTML += `<div>(${timestamp}) ${msg}</div>`;
+    const captureAll = container.querySelector('#mijsr-capture-all');
+
+    const original = {
+      log: console.log,
+      warn: console.warn,
+      error: console.error,
+      info: console.info
     };
-  }
 
-  function renderSettingsTab(container) {
-    container.innerHTML = `
-      <button id="mijsr-destroy">Destroy Sidebar</button>
-    `;
+    function addLog(type, msg) {
+      const timestamp = new Date().toLocaleTimeString();
+      const filter = container.querySelector(`#mijsr-filter-${type}`);
+      if (filter && filter.checked) {
+        logContainer.innerHTML += `<div>[${type.toUpperCase()}] (${timestamp}) ${msg}</div>`;
+      }
+    }
 
-    const destroyButton = container.querySelector('#mijsr-destroy');
-    destroyButton.addEventListener('click', () => {
-      document.querySelector('#mijsr-sidebar').remove();
+    ['log','warn','error','info'].forEach(type => {
+      console[type] = function(...args) {
+        if (captureAll.checked || type === 'log') {
+          addLog(type, args.join(' '));
+        }
+        original[type](...args);
+      };
     });
   }
 
-  // Initialize the script
-  (function initialize() {
-    if (document.querySelector('#mijsr-sidebar')) return; // Prevent duplicate injection
-    loadCSS(SIDEBAR_CSS);
-    createSidebar();
-    createTabs();
-    activateTab('Code'); // Default active tab
-  })();
-})();
+  // Settings Tab
+  function renderSettingsTab(container) {
+    const currentKey = localStorage.getItem('mijsr-keybind') || 'F2';
+    container.innerHTML = `
+      <label>Toggle Keybind: <input id="mijsr-keybind" value="${currentKey}" /></label>
+      <button id="mijsr-save-keybind">Save Keybind</button>
+      <button id="mijsr-destroy">Destroy Sidebar</button>
+      <button id="mijsr-reset">Reset Defaults</button>
+    `;
+
+    container.querySelector('#mijsr-save-keybind').addEventListener('click', () => {
+      const key = container.querySelector('#mijsr-keybind').value;
+      localStorage.setItem('mijsr-keybind', key);
+      alert(`Keybind set to ${key}`);
+    });
+
+    container.querySelector('#mijsr-destroy').addEventListener('click', () => {
+      document.querySelector('#mijsr-sidebar').remove();
+    });
+
+    container.querySelector('#mijsr-reset').addEventListener('click', ()
