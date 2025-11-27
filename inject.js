@@ -1,7 +1,7 @@
 // inject.js
 (async function () {
   const GITHUB_REPO = 'yxorp69/MIJSRv2';
-  const BASE_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}`;
+  const BASE_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_REPO}@main`;
   const SIDEBAR_CSS = `${BASE_URL}/sidebar.css`;
   const APPS_JSON = `${BASE_URL}/apps/apps.json`;
 
