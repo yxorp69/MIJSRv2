@@ -154,8 +154,10 @@
       const response = await fetch(APPS_JSON);
       const apps = await response.json();
       container.innerHTML = apps.map(app => `
-        <div class="mijsr-app">
-          <strong>${app.name}</strong>
+        <div class="mijsr-app" style="border-bottom:1px solid #ccc; padding:5px;">
+          ${app.icon ? `<img src="${app.icon}" alt="${app.name} icon" style="width:24px;height:24px;vertical-align:middle;margin-right:5px;">` : ''}
+          <strong>${app.name}</strong> <small>(v${app.version || '1.0'})</small><br>
+          <em>by ${app.author || 'Unknown'}</em>
           <p>${app.description}</p>
           <button onclick="window.mijsrLoadApp('${app.url}')">Run</button>
         </div>
@@ -224,13 +226,4 @@
     `;
 
     container.querySelector('#mijsr-save-keybind').addEventListener('click', () => {
-      const key = container.querySelector('#mijsr-keybind').value;
-      localStorage.setItem('mijsr-keybind', key);
-      alert(`Keybind set to ${key}`);
-    });
-
-    container.querySelector('#mijsr-destroy').addEventListener('click', () => {
-      document.querySelector('#mijsr-sidebar').remove();
-    });
-
-    container.querySelector('#mijsr-reset').addEventListener('click', ()
+      const
