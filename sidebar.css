@@ -1,0 +1,287 @@
+/* sidebar.css — Styles for MIJSRv2 sidebar, tabs, panels, console, apps, settings */
+
+/* --- Base container --- */
+.mijsr-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 420px;
+  background: #1e1e1e;
+  color: #f0f0f0;
+  font-family: Consolas, monospace, sans-serif;
+  font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.4);
+  z-index: 999999;
+  transition: transform 0.2s ease, width 0.2s ease;
+}
+
+.mijsr-sidebar.closed {
+  transform: translateX(100%);
+}
+
+/* --- Tabs rail --- */
+.mijsr-tabs-rail {
+  width: 60px;
+  background: #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding-top: 8px;
+  border-right: 1px solid #333;
+}
+
+.mijsr-tab-btn {
+  background: none;
+  border: none;
+  color: #ccc;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  font-weight: bold;
+  margin: 4px 0;
+  transition: background 0.2s, color 0.2s;
+}
+
+.mijsr-tab-btn:hover {
+  background: #3a3a3a;
+  color: #fff;
+}
+
+.mijsr-tab-btn.active {
+  background: #444;
+  color: #fff;
+}
+
+/* --- Content area --- */
+.mijsr-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #1e1e1e;
+  padding: 0;
+}
+
+.mijsr-panel {
+  flex: 1;
+  overflow-y: auto;
+  display: none;
+  padding: 12px;
+}
+
+.mijsr-panel-header {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #fff;
+}
+
+.mijsr-panel-desc {
+  font-size: 13px;
+  color: #aaa;
+  margin-bottom: 8px;
+}
+
+/* --- Drag handle --- */
+.mijsr-drag-handle {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 6px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+}
+
+body.mijsr-dragging {
+  cursor: ew-resize !important;
+  user-select: none;
+}
+
+/* --- Controls --- */
+.mijsr-controls-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.mijsr-controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.mijsr-btn {
+  background: #333;
+  border: 1px solid #555;
+  color: #eee;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 13px;
+  transition: background 0.2s, border 0.2s;
+}
+
+.mijsr-btn:hover {
+  background: #444;
+  border-color: #666;
+}
+
+.mijsr-btn.primary {
+  background: #0066cc;
+  border-color: #005bb5;
+  color: #fff;
+}
+
+.mijsr-btn.primary:hover {
+  background: #0077ee;
+}
+
+.mijsr-btn.danger {
+  background: #cc3333;
+  border-color: #aa2222;
+  color: #fff;
+}
+
+.mijsr-btn.danger:hover {
+  background: #dd4444;
+}
+
+/* --- Code tab --- */
+.mijsr-code-input {
+  width: 100%;
+  height: 300px;
+  background: #111;
+  color: #eee;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.mijsr-import-label {
+  font-size: 13px;
+  color: #ccc;
+}
+
+/* --- Apps tab --- */
+.mijsr-apps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mijsr-app-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.mijsr-app-left {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.mijsr-app-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.mijsr-app-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.mijsr-app-title {
+  font-weight: bold;
+  color: #fff;
+}
+
+.mijsr-app-byline {
+  font-size: 12px;
+  color: #aaa;
+}
+
+.mijsr-app-desc {
+  font-size: 13px;
+  color: #ddd;
+}
+
+.mijsr-app-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* --- Console tab --- */
+.mijsr-logs-pane {
+  flex: 1;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 6px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.mijsr-log-row {
+  margin-bottom: 4px;
+}
+
+.mijsr-log-text {
+  margin: 0;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mijsr-log-row.log .mijsr-log-text {
+  color: #eee;
+}
+
+.mijsr-log-row.info .mijsr-log-text {
+  color: #66ccff;
+}
+
+.mijsr-log-row.warn .mijsr-log-text {
+  color: #ffcc00;
+}
+
+.mijsr-log-row.error .mijsr-log-text {
+  color: #ff4444;
+}
+
+/* --- Settings tab --- */
+.mijsr-checkbox {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.mijsr-empty {
+  font-size: 13px;
+  color: #aaa;
+  padding: 6px;
+  text-align: center;
+}
