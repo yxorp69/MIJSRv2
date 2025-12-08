@@ -1,68 +1,175 @@
-# MIJSRv2 by Nope Cheats
+::: {align="center"}
+# **MIJSRv2**
 
-## A modular, resizable in-browser JavaScript runner with sidebar tabs for code execution, apps, console logging, and settings.
+### *by Nope Cheats*
 
-### Features
+`<br>`{=html}
 
-* Resizable Sidebar with vertical binder-style tabs  
-* Code Tab: Write, import, and run custom JavaScript  
-* Apps Tab: Load apps dynamically from `/apps/apps.json`  
-* Console Tab: Filter logs, capture browser console, timestamped output  
-* Settings Tab: Keybind toggle, destroy/reset sidebar, persistent settings via localStorage  
-* Modular Assets:  
-  * `inject.js` → main injection script  
-  * `sidebar.css` → styling  
-  * `/apps/apps.json` → app metadata  
-  * `/apps/\*.js` → app scripts
+```{=html}
+<!-- Badges -->
+```
+`<a href="https://github.com/yxorp69/MIJSRv2/releases">`{=html}
+`<img src="https://img.shields.io/github/v/release/yxorp69/MIJSRv2?label=Release&style=for-the-badge">`{=html}
+`</a>`{=html}
+`<a href="https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2/">`{=html}
+`<img src="https://img.shields.io/jsdelivr/gh/hm/yxorp69/MIJSRv2?label=jsDelivr&style=for-the-badge">`{=html}
+`</a>`{=html}
+`<a href="https://github.com/yxorp69/MIJSRv2/blob/main/LICENSE">`{=html}
+`<img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge">`{=html}
+`</a>`{=html}
+:::
 
-### Installation / Injection Options
+------------------------------------------------------------------------
 
-MIJSRv2 can be injected into any webpage. Two quick methods:
+## 📘 Introduction
 
-1. Bookmarklet Create a new bookmark in your browser and set the URL to:
+**MIJSRv2 (Mini In-Browser JavaScript Runner v2)** is a lightweight,
+modular, and fully resizable **in-browser JavaScript runner** designed
+to be injected into **any webpage**.\
+It features a clean sidebar interface with **vertical binder-style
+tabs**, modular loading, persistent settings, and a flexible app system
+powered by `/apps/apps.json`.
 
-`javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';document.body.appendChild(s);})();`
+MIJSRv2 offers a streamlined way to write, run, and experiment with
+JavaScript directly inside the browser---perfect for debugging,
+developing micro-tools, or extending webpages with custom scripts.
 
-Click the bookmark on any page to inject MIJSRv2.
+------------------------------------------------------------------------
 
-2. Console Command Open your browser’s developer console and paste:
+## 📑 Table of Contents
 
-`var s=document.createElement('script'); s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js'; document.body.appendChild(s);`
+-   [Features](#-features)
+-   [Installation / Injection](#-installation--injection)
+-   [Usage](#-usage)
+-   [Example Apps](#-example-apps)
+-   [Development Notes](#-development-notes)
+-   [License](#-license)
+-   [Future Enhancements](#-future-enhancements)
 
-This will load the sidebar immediately.
+------------------------------------------------------------------------
 
-### Usage
+## ⭐ Features
 
-1. Toggle Sidebar  
-   * Default keybind: Ctrl+Shift+M  
-   * Change it in Settings Tab.  
-2. Code Tab  
-   * Write or paste JavaScript in the textarea.  
-   * Import .js files via the file input.  
-   * Click Run Code to execute.  
-3. Apps Tab  
-   * Loads /apps/apps.json.  
-   * Each app entry shows metadata (name, description, author, version).  
-   * Approve apps with the checkbox before running.  
-   * Click Run to load the app script.  
-4. Console Tab  
-   * Displays MIJSRv2 logs with timestamps.  
-   * Optionally capture all browser logs.  
-   * Filter by log type (LOG, INFO, WARN, ERROR).  
-   * Clear logs with the button.  
-5. Settings Tab  
-   * Change toggle keybind.  
-   * Override cdnBase if needed.  
-   * Destroy sidebar or reset to defaults.  
-   * Settings persist via localStorage.
+-   📏 **Resizable sidebar** with vertical binder-style tab navigation\
+-   ✏️ **Code Tab**
+    -   Write or paste custom JavaScript\
+    -   Import external `.js` files\
+    -   Run code instantly\
+-   📦 **Apps Tab**
+    -   Dynamically loads apps listed in `/apps/apps.json`\
+    -   Apps run in isolated execution contexts\
+-   🖥️ **Console Tab**
+    -   MIJSRv2 internal log output\
+    -   Optional browser console capture\
+    -   Timestamped logs and filtering\
+-   ⚙️ **Settings Tab**
+    -   Change toggle keybind\
+    -   Destroy/reset sidebar\
+    -   Override CDN base URL\
+    -   Persistent settings via `localStorage`\
+-   🧩 **Modular Assets**
+    -   `inject.js`\
+    -   `sidebar.css`\
+    -   `/apps/apps.json`\
+    -   `/apps/*.js`
 
-### Example Apps
+------------------------------------------------------------------------
 
-* Hello World → Prints a message to console.  
-* Clock → Displays live time.  
-* Random Quote → Shows a random inspirational quote.
+## 🚀 Installation / Injection
 
-See /apps/apps.json and /apps/\*.js for implementation.
+MIJSRv2 can be injected into **any webpage** using one of two methods.
 
-License Released under MIT License. © Nope Cheats
+### **A. Bookmarklet**
 
+``` js
+javascript:(()=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2/inject.js';document.body.appendChild(s);})();
+```
+
+### **B. Console Command**
+
+``` js
+(()=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2/inject.js';document.body.appendChild(s);})();
+```
+
+------------------------------------------------------------------------
+
+## 🧭 Usage
+
+### 🔑 **Toggle Sidebar**
+
+Default keybind: **Ctrl+Shift+M**
+
+------------------------------------------------------------------------
+
+### 📄 **Code Tab**
+
+-   Write/paste JS\
+-   Import `.js` files\
+-   Run code instantly
+
+------------------------------------------------------------------------
+
+### 📁 **Apps Tab**
+
+-   Loaded via `/apps/apps.json`\
+-   Approve app → click **Run**\
+-   Executes `/apps/*.js` in isolated context
+
+------------------------------------------------------------------------
+
+### 🖥️ **Console Tab**
+
+-   Shows MIJSRv2 logs\
+-   Optional browser console capture\
+-   Filters: info / warn / error / debug\
+-   Timestamped output
+
+------------------------------------------------------------------------
+
+### ⚙️ **Settings Tab**
+
+-   Change keybind\
+-   Reset / destroy sidebar\
+-   Override `cdnBase`\
+-   Settings persist using `localStorage`
+
+------------------------------------------------------------------------
+
+## 🧪 Example Apps
+
+  App Name       Description
+  -------------- -----------------------------
+  Hello World    Prints a message to console
+  Clock          Live digital clock
+  Random Quote   Displays a random quote
+
+Apps config: `/apps/apps.json`\
+App scripts: `/apps/*.js`
+
+------------------------------------------------------------------------
+
+## 🛠️ Development Notes
+
+-   All assets load via **jsDelivr** (latest release).\
+-   Apps must be **self-contained** and run on load.\
+-   Recommended log prefix:
+
+``` js
+console.log("[Nope Cheats] App loaded.");
+```
+
+------------------------------------------------------------------------
+
+## 📜 License
+
+**MIT License**\
+© *Nope Cheats*
+
+------------------------------------------------------------------------
+
+## 🧩 Future Enhancements
+
+-   More Shields.io badges\
+-   Branded images / logo banner\
+-   Screenshots or demo video\
+-   Optional plugin ecosystem
