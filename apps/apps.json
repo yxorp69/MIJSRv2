@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Hello World",
+    "description": "A simple app that prints 'Hello World' to the MIJSRv2 console.",
+    "url": "apps/hello-world.js",
+    "author": "Nope Cheats",
+    "version": "1.0.0",
+    "icon": ""
+  },
+  {
+    "name": "Clock",
+    "description": "Displays the current time and updates every second.",
+    "url": "apps/clock.js",
+    "author": "Nope Cheats",
+    "version": "1.0.0",
+    "icon": ""
+  },
+  {
+    "name": "Random Quote",
+    "description": "Shows a random inspirational quote when run.",
+    "url": "apps/random-quote.js",
+    "author": "Nope Cheats",
+    "version": "1.0.0",
+    "icon": ""
+  }
+]
