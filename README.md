@@ -47,7 +47,7 @@ It includes tabs for code execution, apps, console logging, and settings—all i
 ### **Bookmarklet**
 
 ```
-javascript:(()=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';document.body.appendChild(s);})();
+javascript:(function(){var s=document.createElement(‘script’);s.src=‘https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js’;document.body.appendChild(s);})();
 ```
 
 ### **Console Command**
