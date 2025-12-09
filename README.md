@@ -1,7 +1,6 @@
+<div align="center">
 # MIJSRv2  
 ### *by Nope Cheats*
-
-<div align="center">
 
 [![GitHub release](https://img.shields.io/github/v/release/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/releases)
 [![License](https://img.shields.io/github/license/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/blob/main/LICENSE)
