@@ -53,7 +53,7 @@ javascript:(function(){var s=document.createElement(‘script’);s.src=‘https
 ### **Console Command**
 
 ```
-javascript:(()=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';document.body.appendChild(s);})();
+var s=document.createElement(‘script’); s.src=‘https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js’; document.body.appendChild(s);
 ```
 
 ---
