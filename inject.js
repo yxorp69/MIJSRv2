@@ -3,21 +3,15 @@
    - Loads assets via jsDelivr from the same GitHub release as this file
    - Injects a resizable horizontal sidebar with vertical "binder separator" tabs
    - Tabs: Code, Apps, Console, Settings
-   - Separation of concerns: injection, UI rendering, app loading, console handling, settings
 */
 
 (() => {
   "use strict";
 
-  // --- Boot & CDN base -------------------------------------------------------
-
   const MIJSRv2 = {
     version: "2.0.0",
     appName: "MIJSRv2",
-    // Detect the jsDelivr base URL from the injected script tag (absolute path)
-    // Assumes this file is loaded from jsDelivr in the same release as other assets.
     cdnBase: null,
-    // Runtime state
     state: {
       isOpen: true,
       widthPx: 420,
@@ -26,9 +20,8 @@
       dragStartWidth: 420,
       captureAllConsole: false,
       consoleFilters: { LOG: true, INFO: true, WARN: true, ERROR: true },
-      keybind: "Control+Shift+M", // default toggle
-      approvedApps: {}, // name -> true
-      appsList: [], // loaded metadata objects
+      keybind: "Control+Shift+M",
+      appsList: [],
       hijacked: false,
     },
     els: {
@@ -57,7 +50,7 @@
     logs: [],
   };
 
-  // Determine cdnBase from the script tag that loaded this file
+  // --- Resolve cdnBase -------------------------------------------------------
   (function resolveCdnBase() {
     const scripts = document.getElementsByTagName("script");
     let src = null;
@@ -68,7 +61,6 @@
         break;
       }
     }
-    // Fallback: look for any script ending with inject.js
     if (!src) {
       for (let i = scripts.length - 1; i >= 0; i--) {
         const s = scripts[i];
@@ -78,22 +70,17 @@
         }
       }
     }
-    // Extract base path (directory) from src
-    // Example: https://cdn.jsdelivr.net/gh/OWNER/REPO@TAG/inject.js
-    // Base becomes: https://cdn.jsdelivr.net/gh/OWNER/REPO@TAG/
     try {
       const url = new URL(src);
       const parts = url.pathname.split("/");
-      parts.pop(); // remove 'inject.js'
+      parts.pop();
       MIJSRv2.cdnBase = `${url.origin}${parts.join("/")}/`;
     } catch {
-      // As a final fallback, let user set base in Settings later
       MIJSRv2.cdnBase = "";
     }
   })();
 
   // --- Storage ---------------------------------------------------------------
-
   const Storage = {
     key: "MIJSRv2.settings",
     load() {
@@ -123,7 +110,6 @@
       if (typeof s.captureAllConsole === "boolean") MIJSRv2.state.captureAllConsole = s.captureAllConsole;
       if (s.consoleFilters) MIJSRv2.state.consoleFilters = { ...MIJSRv2.state.consoleFilters, ...s.consoleFilters };
       if (typeof s.keybind === "string") MIJSRv2.state.keybind = s.keybind;
-      if (s.approvedApps && typeof s.approvedApps === "object") MIJSRv2.state.approvedApps = s.approvedApps;
       if (typeof s.cdnBase === "string" && s.cdnBase) MIJSRv2.cdnBase = s.cdnBase;
     },
     snapshot() {
@@ -133,14 +119,12 @@
         captureAllConsole: MIJSRv2.state.captureAllConsole,
         consoleFilters: MIJSRv2.state.consoleFilters,
         keybind: MIJSRv2.state.keybind,
-        approvedApps: MIJSRv2.state.approvedApps,
         cdnBase: MIJSRv2.cdnBase,
       };
     },
   };
 
-  // --- Logger & Console capture ---------------------------------------------
-
+  // --- Logger & Console capture ----------------------------------------------
   const Logger = {
     log(type, ...args) {
       const ts = new Date();
@@ -176,20 +160,13 @@
         orig.error(...args);
         UI.renderLogs();
       };
-      Logger.log("INFO", "Console capture initialized (default: MIJSRv2 logs only).");
+      Logger.log("INFO", "Console capture initialized.");
     },
   };
 
-  // --- Loader (CSS, JSON, scripts) ------------------------------------------
-
+  // --- Loader ----------------------------------------------------------------
   const Loader = {
-    ensureCdnBaseOrWarn() {
-      if (!MIJSRv2.cdnBase) {
-        Logger.log("WARN", "Unable to infer cdnBase. Set it in Settings to load assets (sidebar.css, apps.json).");
-      }
-    },
     loadCSS() {
-      this.ensureCdnBaseOrWarn();
       if (!MIJSRv2.cdnBase) return;
       const href = MIJSRv2.cdnBase + "sidebar.css";
       if (document.querySelector(`link[data-mijsr="sidebar.css"]`)) return;
@@ -200,7 +177,6 @@
       document.head.appendChild(link);
     },
     async fetchJSON(path) {
-      this.ensureCdnBaseOrWarn();
       const url = MIJSRv2.cdnBase ? MIJSRv2.cdnBase + path : path;
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error(`Failed to fetch ${path}: ${res.status}`);
@@ -217,9 +193,8 @@
       });
     },
   };
-
+})();
   // --- UI -------------------------------------------------------------------
-
   const UI = {
     init() {
       Loader.loadCSS();
@@ -233,20 +208,12 @@
     },
 
     buildSidebar() {
-      // Container
       const container = document.createElement("div");
       container.className = "mijsr-sidebar";
-      container.setAttribute("data-mijsr", "container");
-
-      // Tabs rail (vertical binder separators)
       const tabsRail = document.createElement("div");
       tabsRail.className = "mijsr-tabs-rail";
-
-      // Content area
       const content = document.createElement("div");
       content.className = "mijsr-content";
-
-      // Drag handle
       const drag = document.createElement("div");
       drag.className = "mijsr-drag-handle";
       drag.title = "Drag to resize";
@@ -256,13 +223,11 @@
       container.appendChild(drag);
       document.body.appendChild(container);
 
-      // Save refs
       MIJSRv2.els.container = container;
       MIJSRv2.els.tabsRail = tabsRail;
       MIJSRv2.els.content = content;
       MIJSRv2.els.dragHandle = drag;
 
-      // Drag events
       drag.addEventListener("mousedown", (e) => {
         MIJSRv2.state.dragging = true;
         MIJSRv2.state.dragStartX = e.clientX;
@@ -272,7 +237,7 @@
       document.addEventListener("mousemove", (e) => {
         if (!MIJSRv2.state.dragging) return;
         const dx = MIJSRv2.state.dragStartX - e.clientX;
-        const newWidth = Math.max(280, MIJSRv2.state.dragStartWidth + dx); // sidebar on right
+        const newWidth = Math.max(280, MIJSRv2.state.dragStartWidth + dx);
         MIJSRv2.state.widthPx = newWidth;
         this.applyWidth();
       });
@@ -292,7 +257,6 @@
         { id: "settings", label: "Settings" },
       ];
 
-      // Build buttons on rail
       tabs.forEach((t) => {
         const btn = document.createElement("button");
         btn.className = "mijsr-tab-btn";
@@ -302,7 +266,6 @@
         MIJSRv2.els.tabsRail.appendChild(btn);
       });
 
-      // Build panels
       const codePanel = this.buildCodePanel();
       const appsPanel = this.buildAppsPanel();
       const consolePanel = this.buildConsolePanel();
@@ -313,7 +276,6 @@
       MIJSRv2.els.content.appendChild(consolePanel);
       MIJSRv2.els.content.appendChild(settingsPanel);
 
-      // Show default tab
       this.showTab("code");
     },
 
@@ -371,7 +333,6 @@
         const code = textarea.value || "";
         try {
           Logger.log("INFO", "Executing code...");
-          // Execute in a new Function scope to avoid "use strict" conflicts
           const fn = new Function(code);
           const result = fn();
           Logger.log("LOG", "Execution result:", result);
@@ -405,7 +366,7 @@
 
       const desc = document.createElement("div");
       desc.className = "mijsr-panel-desc";
-      desc.textContent = "Apps are loaded from /apps/apps.json and run only if approved.";
+      desc.textContent = "Apps are loaded from /apps/apps.json.";
 
       const controls = document.createElement("div");
       controls.className = "mijsr-controls-row";
@@ -427,12 +388,10 @@
       MIJSRv2.els.apps.list = list;
       MIJSRv2.els.apps.refreshBtn = refreshBtn;
 
-      // Initial load
       setTimeout(() => Apps.loadAppsList(), 0);
 
       return panel;
     },
-
     buildConsolePanel() {
       const panel = document.createElement("div");
       panel.className = "mijsr-panel";
@@ -576,7 +535,6 @@
       const col = document.createElement("div");
       col.className = "mijsr-controls-col";
 
-      // Keybind
       const kbWrap = document.createElement("div");
       kbWrap.className = "mijsr-controls-row";
       const kbLabel = document.createElement("label");
@@ -585,7 +543,6 @@
       kbInput.type = "text";
       kbInput.value = MIJSRv2.state.keybind;
 
-      // CDN base override (optional)
       const cdnWrap = document.createElement("div");
       cdnWrap.className = "mijsr-controls-row";
       const cdnLabel = document.createElement("label");
@@ -602,7 +559,7 @@
         MIJSRv2.state.keybind = kbInput.value.trim() || "Control+Shift+M";
         MIJSRv2.cdnBase = cdnInput.value.trim() || MIJSRv2.cdnBase;
         Storage.save(Storage.snapshot());
-        Loader.loadCSS(); // reload if necessary
+        Loader.loadCSS();
         Logger.log("INFO", "Settings saved.");
       });
 
@@ -621,7 +578,6 @@
         Storage.reset();
         Logger.log("INFO", "Settings reset. Reinitializing...");
         UI.destroy(false);
-        // Reapply defaults
         MIJSRv2.state = {
           isOpen: true,
           widthPx: 420,
@@ -631,9 +587,8 @@
           captureAllConsole: false,
           consoleFilters: { LOG: true, INFO: true, WARN: true, ERROR: true },
           keybind: "Control+Shift+M",
-          approvedApps: {},
           appsList: [],
-          hijacked: true, // keep hijacked as true to avoid re-wrapping
+          hijacked: true,
         };
         UI.init();
       });
@@ -664,7 +619,6 @@
     attachGlobalKeybind() {
       document.addEventListener("keydown", (e) => {
         const desired = MIJSRv2.state.keybind;
-        // Compose actual pressed combo string
         const parts = [];
         if (e.ctrlKey) parts.push("Control");
         if (e.shiftKey) parts.push("Shift");
@@ -681,11 +635,8 @@
 
       function normalizeKey(k) {
         if (!k) return "";
-        const map = {
-          " ": "Space",
-        };
+        const map = { " ": "Space" };
         const std = map[k] || k;
-        // Use single-letter uppercase for a-z
         if (std.length === 1) return std.toUpperCase();
         return std;
       }
@@ -736,7 +687,6 @@
   };
 
   // --- Apps ------------------------------------------------------------------
-
   const Apps = {
     async loadAppsList() {
       try {
@@ -751,37 +701,20 @@
       }
     },
 
-    isApproved(name) {
-      return !!MIJSRv2.state.approvedApps[name];
-    },
-
-    setApproved(name, approved) {
-      MIJSRv2.state.approvedApps[name] = !!approved;
-      Storage.save(Storage.snapshot());
-    },
-
     async runApp(app) {
-      if (!this.isApproved(app.name)) {
-        Logger.log("WARN", `App "${app.name}" is not approved. Approve it to run.`);
-        return;
-      }
       try {
         const url = resolveAppUrl(app);
         Logger.log("INFO", `Loading app script: ${url}`);
         await Loader.loadScriptByUrl(url);
         Logger.log("LOG", `App "${app.name}" loaded.`);
-        // App scripts are expected to self-initialize or expose globals.
       } catch (err) {
         Logger.log("ERROR", `Failed to run app "${app.name}":`, err);
       }
 
       function resolveAppUrl(appMeta) {
-        // If metadata includes an absolute or cdn URL, use it directly.
         if (appMeta.url.startsWith("http://") || appMeta.url.startsWith("https://")) {
           return appMeta.url;
         }
-        // Otherwise, treat as relative path under release base.
-        // Example: apps/my-app.js
         return MIJSRv2.cdnBase ? MIJSRv2.cdnBase + appMeta.url.replace(/^\//, "") : appMeta.url;
       }
     },
@@ -807,14 +740,6 @@
       const left = document.createElement("div");
       left.className = "mijsr-app-left";
 
-      if (app.icon) {
-        const img = document.createElement("img");
-        img.className = "mijsr-app-icon";
-        img.src = `data:image/png;base64,${app.icon}`;
-        img.alt = `${app.name} icon`;
-        left.appendChild(img);
-      }
-
       const meta = document.createElement("div");
       meta.className = "mijsr-app-meta";
 
@@ -839,41 +764,20 @@
       const right = document.createElement("div");
       right.className = "mijsr-app-right";
 
-      const approveWrap = document.createElement("label");
-      approveWrap.className = "mijsr-checkbox";
-      const approve = document.createElement("input");
-      approve.type = "checkbox";
-      approve.checked = Apps.isApproved(app.name);
-      approve.addEventListener("change", () => Apps.setApproved(app.name, approve.checked));
-      const approveSpan = document.createElement("span");
-      approveSpan.textContent = "Approved";
-      approveWrap.appendChild(approve);
-      approveWrap.appendChild(approveSpan);
-
       const runBtn = document.createElement("button");
       runBtn.className = "mijsr-btn primary";
       runBtn.textContent = "Run";
-      runBtn.disabled = !Apps.isApproved(app.name);
-      approve.addEventListener("change", () => {
-        runBtn.disabled = !approve.checked;
-      });
       runBtn.addEventListener("click", () => Apps.runApp(app));
 
-      right.appendChild(approveWrap);
       right.appendChild(runBtn);
 
       item.appendChild(left);
       item.appendChild(right);
-
       list.appendChild(item);
     });
   };
 
-  // --- Bootstrap -------------------------------------------------------------
-
-  (function bootstrap() {
-    Storage.applyToState();
-    UI.init();
-  })();
-
+  // --- Initialize ------------------------------------------------------------
+  Storage.applyToState();
+  UI.init();
 })();
