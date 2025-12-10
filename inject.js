@@ -846,7 +846,7 @@
       approve.checked = Apps.isApproved(app.name);
       approve.addEventListener("change", () => Apps.setApproved(app.name, approve.checked));
       const approveSpan = document.createElement("span");
-      approveSpan.textContent = "Approved";
+      approveSpan.textContent = "You Sure?";
       approveWrap.appendChild(approve);
       approveWrap.appendChild(approveSpan);
 
