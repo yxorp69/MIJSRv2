@@ -59,6 +59,8 @@ s.src = 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';
 document.body.appendChild(s);
 ```
 
+<small>**Note:** It might take up to 7 days for you to get the latest version of the injection script, but I actively force the CDN to update it.</small>
+
 ---
 
 ## 🕹️ Usage
