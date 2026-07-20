@@ -23,4 +23,12 @@
     "version": "1.0.0",
     "icon": ""
   }
+  {
+    "name": "Eruda DevTools",
+    "description": "Loads the Eruda DevTools",
+    "url": "apps/eruda.js",
+    "author": "Nope Cheats",
+    "version": "1.0.0",
+    "icon": "https://play-lh.googleusercontent.com/h3jjCBv7M6DLdx6GymgIRCKDbAx-SM1k1wE2J1Yaplar8kysWrZHt2FhaXbEj8Sz0EZ0wgjUtUAAyfqg2s8x=w240-h480-rw"
+  }
 ]
