@@ -39,14 +39,14 @@ Each app shows a **confirmation modal** before running, so you stay in control.
 ### **Bookmarklet** (drag this to your bookmarks bar or copy into a bookmark)
 
 ```javascript
-javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';document.body.appendChild(s);})();
+javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@main/inject.js';document.body.appendChild(s);})();
 ```
 
 ### **Console Command** (paste in your browser's dev tools)
 
 ```javascript
 var s = document.createElement('script');
-s.src = 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';
+s.src = 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@main/inject.js';
 document.body.appendChild(s);
 ```
 > [!NOTE]
