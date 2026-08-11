@@ -49,7 +49,8 @@
   }
 
   function icon(faClass, emoji) {
-    if (window.__faFailed) return `<span class="mijsr-emoji">${emoji}</span>`;
+    // Only show emoji when Font Awesome has explicitly failed to load
+    if (window.__faFailed === true) return `<span class="mijsr-emoji">${emoji}</span>`;
     return `<i class="fas ${faClass}"></i>`;
   }
 
@@ -190,7 +191,19 @@
 
   async function loadAndRunApp(url) {
     try {
-      const fullUrl = url.startsWith('http') ? url : `${CONFIG.cdnBase}/apps/${url}`;
+      let fullUrl;
+      if (url.startsWith('http')) {
+        fullUrl = url;
+      } else {
+        // Normalize path to avoid duplicate /apps/apps/... when app.url already contains 'apps/'
+        const path = url.replace(/^\/+/, '');
+        if (path.startsWith('apps/')) {
+          fullUrl = `${CONFIG.cdnBase}/${path}`;
+        } else {
+          fullUrl = `${CONFIG.cdnBase}/apps/${path}`;
+        }
+      }
+
       const resp = await fetch(fullUrl);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const code = await resp.text();
