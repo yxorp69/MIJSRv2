@@ -1,10 +1,10 @@
 <div align="center">
 
-# MIJSRv2  
-### *by Nope Cheats*
+# MIJSRv2 
+### by Nope Cheats
 
 [![GitHub release](https://img.shields.io/github/v/release/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/releases)
-[![License](https://img.shields.io/github/license/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/blob/main/LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
 [![jsDelivr](https://img.shields.io/badge/jsDelivr-CDN-blue?style=for-the-badge)](https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js)
 [![GitHub stars](https://img.shields.io/github/stars/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/network)
@@ -12,116 +12,93 @@
 
 </div>
 
+---
+
+## 📌 What is MIJSRv2?
+
+**MIJSRv2** is a lightweight, in‑browser JavaScript tool that you can inject into any webpage. 
+It appears as a **resizable sidebar** with a clean, modern dark interface – perfect for testing scripts, running curated mini‑apps, or debugging on the fly.
 
 ---
 
-## 📌 Overview
+## ✨ Features
 
-**MIJSRv2 (Mini In-Browser JavaScript Runner v2)** is a lightweight, modular, and resizable in-browser JavaScript runner designed to be injected into any webpage.  
-It includes tabs for code execution, apps, console logging, and settings—all in a compact, customizable sidebar.
-
----
-
-## 🚀 Features
-
-- Resizable sidebar with binder-style vertical tabs.
-- **Code Tab** — write, import, and run JavaScript.
-- **Apps Tab** — dynamically loads apps from `/apps/apps.json`.
-- **Console Tab**
-  - Timestamped logs  
-  - Browser console capture  
-  - Log filtering  
-- **Settings Tab**
-  - Change keybind  
-  - Destroy/reset UI  
-  - Persistent settings (localStorage)  
-- Modular structure:
-  - `inject.js`
-  - `sidebar.css`
-  - `/apps/apps.json`
-  - `/apps/*.js`
+- **Modern, user‑friendly UI** – warm dark theme, rounded cards, and clear typography.
+- **Code Editor** – write, import, and run JavaScript instantly.
+- **Curated App Store** – browse and run a selection of pre‑approved apps (Hello World, Clock, Random Quote, and more). 
+Each app shows a **confirmation modal** before running, so you stay in control.
+- **Console** – view your logs with timestamps, filter by level (Log / Warn / Error), and clear with one click.
+- **Custom Keybind** – change the toggle shortcut (default `Ctrl+Shift+M`).
+- **Persistent Settings** – your preferences are saved automatically.
+- **Font Awesome Icons** – with automatic emoji fallback (works even if the CDN is blocked).
 
 ---
 
-## 📥 Installation / Injection
+## 📥 How to Inject
 
-### **Bookmarklet**
+### **Bookmarklet** (drag this to your bookmarks bar)
 
+```javascript
+javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';document.body.appendChild(s);})();
 ```
-javascript:(function(){var s=document.createElement(‘script’);s.src=‘https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js’;document.body.appendChild(s);})();
-```
 
-### **Console Command**
+### **Console Command** (paste in your browser's dev tools)
 
-```
+```javascript
 var s = document.createElement('script');
 s.src = 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';
 document.body.appendChild(s);
 ```
-
-<small>**Note:** It might take up to 7 days for you to get the latest version of the injection script, but I actively force the CDN to update it.</small>
-
----
-
-## 🕹️ Usage
-
-### **Toggle Sidebar**
-Default keybind: **Ctrl + Shift + M**
-
-### **Tabs**
-
-#### Code Tab
-- Write or paste JS  
-- Import `.js` files  
-- Run immediately  
-
-#### Apps Tab
-- Loads apps from `/apps/apps.json`  
-- Approve → Run  
-
-#### Console Tab
-- View MIJSRv2 logs  
-- Capture browser logs  
-- Filter + clear logs  
-
-#### Settings Tab
-- Change keybind  
-- Override CDN base  
-- Destroy/reset  
-- Auto-saves via localStorage  
+> [!NOTE]
+> Note: The CDN may take a few minutes to reflect the latest version after a release.
 
 ---
 
-## 📂 Example Apps
+## 🎮 How to Use
 
-- **Hello World** — logs a greeting  
-- **Clock** — live time display  
-- **Random Quote** — shows a random quote  
-
-Apps live in:
-
-```
-/apps/apps.json
-/apps/*.js
-```
-
----
-
-## 🛠️ Development Notes
-
-- All assets load from jsDelivr using the latest GitHub release.
-- Apps should be standalone scripts.
-- Use `[Nope Cheats]` log branding.
+1. Inject the script using the bookmarklet or console.
+2. The sidebar is closed by default – press Ctrl+Shift+M (or your custom keybind) to open it.
+3. Explore the tabs:
+· Code – write or paste your JavaScript, then click Run.
+· Import – load a .js file from your computer.
+· Export – save your current code as a file.
+· Apps – browse the apps I’ve included; click Run to see a confirmation modal, then Approve & Run to execute.
+· Console – see all logs (including from the page). Use the filter dropdown to focus on specific message types, or hit Clear to reset.
+· Settings – change your keybind or destroy MIJSR completely (clears all stored data).
+4. Resize the sidebar by dragging the left edge.
 
 ---
 
-## 📜 License
+📦 Included Apps
 
-MIT License  
-© Nope Cheats
+These apps are maintained and distributed by me:
+
+· Hello World – logs a friendly greeting.
+· Clock – shows the current time.
+· Random Quote – displays a motivational quote.
+
+💡 Want to suggest a new app? Open an issue or submit a pull request – I review and approve all additions personally.
 
 ---
 
-## 📸 Screenshots (Coming Soon)
+📜 License
 
-_Add UI images or GIFs here later._
+This project is licensed under the GNU General Public License v3.0 – see the LICENSE file for details.
+All rights to the project and its curated content belong to Nope Cheats.
+
+---
+
+🤝 Contributing
+
+Contributions are welcome! If you have a bug report, feature request, or a new app suggestion, please open an issue or submit a pull request.
+All contributions are subject to my approval.
+
+---
+
+🙋 Need Help?
+
+Open an issue on GitHub – I’ll get back to you as soon as I can.
+
+---
+
+Enjoy using MIJSRv2!
