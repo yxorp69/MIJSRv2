@@ -1,10 +1,10 @@
 <div align="center">
 
 # MIJSRv2 
-### by Nope Cheats
+### by Hermes Enterprise
 
 [![GitHub release](https://img.shields.io/github/v/release/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?style=for-the-badge)](LICENSE)
 [![jsDelivr](https://img.shields.io/badge/jsDelivr-CDN-blue?style=for-the-badge)](https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js)
 [![GitHub stars](https://img.shields.io/github/stars/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/yxorp69/MIJSRv2?style=for-the-badge)](https://github.com/yxorp69/MIJSRv2/network)
@@ -36,7 +36,7 @@ Each app shows a **confirmation modal** before running, so you stay in control.
 
 ## 📥 How to Inject
 
-### **Bookmarklet** (drag this to your bookmarks bar)
+### **Bookmarklet** (drag this to your bookmarks bar or copy into a bookmark)
 
 ```javascript
 javascript:(function(){var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';document.body.appendChild(s);})();
@@ -50,7 +50,7 @@ s.src = 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest/inject.js';
 document.body.appendChild(s);
 ```
 > [!NOTE]
-> Note: The CDN may take a few minutes to reflect the latest version after a release.
+> The CDN may take a few minutes to reflect the latest version after a release.
 
 ---
 
@@ -59,43 +59,44 @@ document.body.appendChild(s);
 1. Inject the script using the bookmarklet or console.
 2. The sidebar is closed by default – press Ctrl+Shift+M (or your custom keybind) to open it.
 3. Explore the tabs:
-· Code – write or paste your JavaScript, then click Run.
-· Import – load a .js file from your computer.
-· Export – save your current code as a file.
-· Apps – browse the apps I’ve included; click Run to see a confirmation modal, then Approve & Run to execute.
-· Console – see all logs (including from the page). Use the filter dropdown to focus on specific message types, or hit Clear to reset.
-· Settings – change your keybind or destroy MIJSR completely (clears all stored data).
+   - **Code** – write or paste your JavaScript, then click Run.
+   - **Import** – load a .js file from your computer.
+   - **Export** – save your current code as a file.
+   - **Apps** – browse the apps I’ve included; click Run to see a confirmation modal, then Approve & Run to execute.
+   - **Console** – see all logs (including from the page). Use the filter dropdown to focus on specific message types, or hit Clear to reset.
+   - **Settings** – change your keybind or destroy MIJSR completely (clears all stored data).
 4. Resize the sidebar by dragging the left edge.
 
 ---
 
-📦 Included Apps
+## 📦 Included Apps
 
-These apps are maintained and distributed by me:
+These apps are maintained and distributed by me.
 
-· Hello World – logs a friendly greeting.
-· Clock – shows the current time.
-· Random Quote – displays a motivational quote.
+- **Hello World** – logs a friendly greeting.
+- **Clock** – shows the current time.
+- **Random Quote** – displays a motivational quote.
+- And many more!
 
 💡 Want to suggest a new app? Open an issue or submit a pull request – I review and approve all additions personally.
 
 ---
 
-📜 License
+## 📜 License
 
-This project is licensed under the GNU General Public License v3.0 – see the LICENSE file for details.
-All rights to the project and its curated content belong to Nope Cheats.
+This project is licensed under the GNU General Public License v3.0 – see the [LICENSE](LICENSE) file for details.
+All rights to the project and its curated content belong to @Hermes-Enterprise and @yxorp69.
 
 ---
 
-🤝 Contributing
+## 🤝 Contributing
 
 Contributions are welcome! If you have a bug report, feature request, or a new app suggestion, please open an issue or submit a pull request.
 All contributions are subject to my approval.
 
 ---
 
-🙋 Need Help?
+## 🙋 Need Help?
 
 Open an issue on GitHub – I’ll get back to you as soon as I can.
 
