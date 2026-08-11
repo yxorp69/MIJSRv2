@@ -5,7 +5,7 @@
     version: '3.0.0',
     defaultKeybind: 'Control+Shift+M',
     localStorageKey: 'mijsr_state',
-    cdnBase: 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest'
+    cdnBase: 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@main'
   };
 
   function loadCSS() {
