@@ -1,8 +1,6 @@
-// MIJSRv2 - Injector
 (function() {
   'use strict';
 
-  // ---- CONFIG ----
   const CONFIG = {
     version: '3.0.0',
     defaultKeybind: 'Control+Shift+M',
@@ -10,46 +8,32 @@
     cdnBase: 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest'
   };
 
-  // ---- STATE ----
   let state = {
     open: false,
     width: 400,
     activeTab: 'code',
     keybind: CONFIG.defaultKeybind,
     consoleLogs: [],
-    filterLevel: 'all', // 'all', 'log', 'warn', 'error'
+    filterLevel: 'all',
     approvedApps: JSON.parse(localStorage.getItem('mijsr_approved') || '[]')
   };
 
-  // Load persisted state
   try {
     const saved = JSON.parse(localStorage.getItem(CONFIG.localStorageKey));
     if (saved) {
       state = { ...state, ...saved };
-      // Ensure open is always false on first load? Actually if saved had open=true, we respect it.
-      // But user wants it closed by default. So we force it to false if no explicit saved? 
-      // We'll set default to false, and if saved has open, we keep it, but we want fresh start? 
-      // The user said "the first time it’s ran it stays closed until opened". 
-      // So we check if this is the first run. We can use a separate flag or just set open to false always on injection.
-      // To allow persistence across sessions, we keep the saved value, but we reset open to false if it's the first time.
-      // I'll add a first-run flag.
     }
   } catch (_) {}
 
-  // Force close on first injection ever
   if (!localStorage.getItem('mijsr_first_run')) {
     state.open = false;
     localStorage.setItem('mijsr_first_run', 'true');
   } else {
-    // But we still want to respect saved open state? User says "sidebar should be closed when the script is loaded"
-    // So we always set open to false on load, regardless of saved state.
     state.open = false;
   }
 
-  // ---- DOM REFS ----
   let sidebar, resizeHandle, panels, tabs, consoleContainer;
 
-  // ---- HELPERS ----
   function saveState() {
     try {
       localStorage.setItem(CONFIG.localStorageKey, JSON.stringify(state));
@@ -57,12 +41,10 @@
   }
 
   function icon(faClass, emoji) {
-    // If Font Awesome failed to load, fallback to emoji
     if (window.__faFailed) return `<span class="mijsr-emoji">${emoji}</span>`;
     return `<i class="fas ${faClass}"></i>`;
   }
 
-  // ---- LOAD FONT AWESOME WITH FALLBACK ----
   function loadFontAwesome() {
     return new Promise((resolve) => {
       const link = document.createElement('link');
@@ -71,7 +53,6 @@
       link.onload = () => { window.__faFailed = false; resolve(); };
       link.onerror = () => { window.__faFailed = true; resolve(); };
       document.head.appendChild(link);
-      // Also set a timeout in case it hangs
       setTimeout(() => {
         if (window.__faFailed === undefined) window.__faFailed = true;
         resolve();
@@ -79,33 +60,18 @@
     });
   }
 
-  // ---- RENDER SIDEBAR ----
   function renderSidebar() {
     if (!sidebar) return;
-
-    // Main visibility
     sidebar.style.display = state.open ? 'flex' : 'none';
-
-    // Width
     sidebar.style.width = state.width + 'px';
-
-    // Tabs
     document.querySelectorAll('.mijsr-tab-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === state.activeTab);
     });
-
-    // Panels
     document.querySelectorAll('.mijsr-panel').forEach(panel => {
       panel.style.display = panel.id === `mijsrPanel${capitalize(state.activeTab)}` ? 'block' : 'none';
     });
-
-    // Update console
     renderConsole();
-
-    // Update apps
     renderApps();
-
-    // Update settings
     renderSettings();
   }
 
@@ -113,7 +79,6 @@
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  // ---- CONSOLE ----
   function renderConsole() {
     const container = document.getElementById('mijsrConsoleContainer');
     if (!container) return;
@@ -134,7 +99,6 @@
     return div.innerHTML;
   }
 
-  // ---- APPS ----
   let appsList = [];
 
   async function fetchApps() {
@@ -166,7 +130,6 @@
       </div>
     `).join('');
 
-    // Attach run events
     container.querySelectorAll('.mijsr-app-run').forEach(btn => {
       btn.addEventListener('click', () => {
         const url = btn.dataset.url;
@@ -177,7 +140,6 @@
     });
   }
 
-  // ---- APPROVAL MODAL ----
   function showApprovalModal(app) {
     const modal = document.getElementById('mijsrModal');
     const content = document.getElementById('mijsrModalContent');
@@ -202,12 +164,10 @@
 
     modal.style.display = 'flex';
 
-    // Close handlers
     document.getElementById('mijsrModalClose').addEventListener('click', () => { modal.style.display = 'none'; });
     document.getElementById('mijsrModalCancel').addEventListener('click', () => { modal.style.display = 'none'; });
     document.getElementById('mijsrModalApprove').addEventListener('click', () => {
       modal.style.display = 'none';
-      // Add to approved list (optional, but we don't need a checkbox now)
       if (!state.approvedApps.includes(app.name)) {
         state.approvedApps.push(app.name);
         localStorage.setItem('mijsr_approved', JSON.stringify(state.approvedApps));
@@ -215,7 +175,6 @@
       loadAndRunApp(app.url);
     });
 
-    // Click outside to close
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.style.display = 'none';
     });
@@ -227,7 +186,6 @@
       const resp = await fetch(fullUrl);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const code = await resp.text();
-      // Execute in a sandbox-like way using Function constructor (or eval)
       new Function(code)();
       addConsoleLog(`✅ App loaded from ${fullUrl}`, 'log');
     } catch (e) {
@@ -235,7 +193,6 @@
     }
   }
 
-  // ---- SETTINGS ----
   function renderSettings() {
     const container = document.getElementById('mijsrSettingsContainer');
     if (!container) return;
@@ -251,7 +208,6 @@
       </div>
     `;
 
-    // Keybind input with capture
     const input = document.getElementById('mijsrKeybind');
     input.addEventListener('keydown', (e) => {
       e.preventDefault();
@@ -267,11 +223,9 @@
       input.value = combo;
       state.keybind = combo;
       saveState();
-      // Update listener
       setupKeyListener();
     });
 
-    // Destroy
     document.getElementById('mijsrDestroy').addEventListener('click', () => {
       if (confirm('Destroy MIJSR and clear all data?')) {
         localStorage.removeItem(CONFIG.localStorageKey);
@@ -284,7 +238,6 @@
     });
   }
 
-  // ---- CONSOLE CAPTURE ----
   function addConsoleLog(message, level = 'log') {
     state.consoleLogs.push({ message, level, timestamp: Date.now() });
     if (state.consoleLogs.length > 500) state.consoleLogs.shift();
@@ -292,7 +245,6 @@
     if (state.activeTab === 'console') renderConsole();
   }
 
-  // Override console methods
   function hookConsole() {
     const origLog = console.log;
     const origWarn = console.warn;
@@ -312,7 +264,6 @@
     };
   }
 
-  // ---- KEY LISTENER ----
   let keyListener = null;
 
   function setupKeyListener() {
@@ -337,22 +288,17 @@
     document.addEventListener('keydown', keyListener);
   }
 
-  // ---- BUILD UI ----
   async function buildUI() {
-    // Load Font Awesome (non-blocking)
     loadFontAwesome();
 
-    // Create sidebar container
     sidebar = document.createElement('div');
     sidebar.id = 'mijsrSidebar';
-    sidebar.style.display = 'none'; // closed by default
+    sidebar.style.display = 'none';
 
-    // Resize handle
     resizeHandle = document.createElement('div');
     resizeHandle.className = 'mijsr-resize-handle';
     sidebar.appendChild(resizeHandle);
 
-    // ---- SIDEBAR HTML ----
     sidebar.innerHTML += `
       <div class="mijsr-header">
         <span class="mijsr-title">📦 MIJSR</span>
@@ -399,7 +345,6 @@
           <div id="mijsrSettingsContainer"></div>
         </div>
       </div>
-      <!-- MODAL (hidden by default) -->
       <div id="mijsrModal" class="mijsr-modal" style="display:none;">
         <div id="mijsrModalContent" class="mijsr-modal-content"></div>
       </div>
@@ -407,36 +352,29 @@
 
     document.body.appendChild(sidebar);
 
-    // ---- CACHE ELEMENTS ----
     tabs = sidebar.querySelectorAll('.mijsr-tab-btn');
     panels = sidebar.querySelectorAll('.mijsr-panel');
     consoleContainer = document.getElementById('mijsrConsoleContainer');
 
-    // ---- EVENT BINDING ----
-    // Tabs
     tabs.forEach(btn => {
       btn.addEventListener('click', () => {
         state.activeTab = btn.dataset.tab;
         saveState();
         renderSidebar();
-        // If console tab, scroll to bottom
         if (state.activeTab === 'console') {
           const container = document.getElementById('mijsrConsoleContainer');
           if (container) container.scrollTop = container.scrollHeight;
         }
-        // If apps tab, ensure apps are loaded
         if (state.activeTab === 'apps' && !appsList.length) fetchApps();
       });
     });
 
-    // Toggle button (close)
     document.getElementById('mijsrToggle').addEventListener('click', () => {
       state.open = !state.open;
       saveState();
       renderSidebar();
     });
 
-    // Code runner
     document.getElementById('mijsrRunCode').addEventListener('click', () => {
       const code = document.getElementById('mijsrCodeInput').value;
       try {
@@ -448,7 +386,6 @@
       }
     });
 
-    // Import/Export
     document.getElementById('mijsrImportCode').addEventListener('click', () => {
       const input = document.createElement('input');
       input.type = 'file';
@@ -475,21 +412,18 @@
       URL.revokeObjectURL(a.href);
     });
 
-    // Console filter
     document.getElementById('mijsrConsoleFilter').addEventListener('change', (e) => {
       state.filterLevel = e.target.value;
       saveState();
       renderConsole();
     });
 
-    // Clear console
     document.getElementById('mijsrClearConsole').addEventListener('click', () => {
       state.consoleLogs = [];
       saveState();
       renderConsole();
     });
 
-    // Resize handle
     let isResizing = false;
     resizeHandle.addEventListener('mousedown', (e) => {
       isResizing = true;
@@ -508,29 +442,19 @@
       sidebar.style.width = newWidth + 'px';
     }
 
-    // ---- FINALISE ----
     hookConsole();
     setupKeyListener();
-
-    // Load apps
     fetchApps();
-
-    // Initial render
     renderSidebar();
 
-    // Add to global
     window.MIJSR = { state, renderSidebar, addConsoleLog };
-
-    // Log startup
     addConsoleLog(`🚀 MIJSR v${CONFIG.version} loaded`, 'log');
     addConsoleLog(`💡 Press ${state.keybind} to toggle sidebar`, 'log');
   }
 
-  // ---- INJECT ----
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', buildUI);
   } else {
     buildUI();
   }
-
 })();
