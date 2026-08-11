@@ -8,6 +8,14 @@
     cdnBase: 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest'
   };
 
+  function loadCSS() {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = `${CONFIG.cdnBase}/sidebar.css`;
+    link.id = 'mijsr-styles';
+    document.head.appendChild(link);
+  }
+
   let state = {
     open: false,
     width: 400,
@@ -289,6 +297,7 @@
   }
 
   async function buildUI() {
+    loadCSS();
     loadFontAwesome();
 
     sidebar = document.createElement('div');
