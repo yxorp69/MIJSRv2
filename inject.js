@@ -1,11 +1,28 @@
 (function() {
   'use strict';
 
+  const currentScript = document.currentScript;
+  const scriptSrc = currentScript ? currentScript.src : '';
+  const isLocalDev = scriptSrc.includes('localhost') || scriptSrc.includes('127.0.0.1') || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+  const getBaseUrl = () => {
+      if (isLocalDev && scriptSrc) {
+          const url = new URL(scriptSrc);
+          return url.origin.replace(/\/+$/, '');
+      }
+      return 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest';
+  };
+
+  const PROD_CDN_BASE = 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@latest';
+  const FA_CDN_URL = 'https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css';
+
   const CONFIG = {
     version: '3.0.0',
     defaultKeybind: 'Control+Shift+M',
-    localStorageKey: 'mijsr_state',
-    cdnBase: 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@main'
+    localStorageKey: 'MIJSRv2_settings',
+    cdnBase: getBaseUrl(),
+    prodCdnBase: PROD_CDN_BASE,
+    faCdnUrl: FA_CDN_URL
   };
 
   function loadCSS() {
@@ -40,7 +57,7 @@
     state.open = false;
   }
 
-  let sidebar, resizeHandle, panels, tabs, consoleContainer;
+  let sidebar, panels, tabs, consoleContainer;
 
   function saveState() {
     try {
@@ -58,7 +75,8 @@
     return new Promise((resolve) => {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css';
+      // Use locally hosted or CDN-provided Font Awesome via our CDN base
+      link.href = CONFIG.faCdnUrl;
       link.onload = () => { window.__faFailed = false; resolve(); };
       link.onerror = () => { window.__faFailed = true; resolve(); };
       document.head.appendChild(link);
@@ -112,7 +130,7 @@
 
   async function fetchApps() {
     try {
-      const resp = await fetch(`${CONFIG.cdnBase}/apps/apps.json`);
+      const resp = await fetch('https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@main/apps/apps.json');
       if (!resp.ok) throw new Error('Failed to fetch apps');
       appsList = await resp.json();
       renderApps();
@@ -149,6 +167,38 @@
     });
   }
 
+  function searchApps(query) {
+    const q = (query || '').toLowerCase();
+    const filtered = appsList.filter(app =>
+      app.name.toLowerCase().includes(q) ||
+      (app.description || '').toLowerCase().includes(q)
+    );
+    const container = document.getElementById('mijsrAppsContainer');
+    if (!container) return;
+    if (!filtered.length) {
+      container.innerHTML = '<p class="mijsr-muted">No apps found.</p>';
+      return;
+    }
+    container.innerHTML = filtered.map(app => `
+      <div class="mijsr-app-card">
+        <div class="mijsr-app-info">
+          <div class="mijsr-app-name">${escapeHtml(app.name)}</div>
+          <div class="mijsr-app-desc">${escapeHtml(app.description || '')}</div>
+          <div class="mijsr-app-meta">by ${escapeHtml(app.author || 'unknown')} • v${escapeHtml(app.version || '1.0')}</div>
+        </div>
+        <button class="mijsr-app-run" data-app="${escapeHtml(app.name)}" data-url="${escapeHtml(app.url)}">${icon('fa-play', '▶️')} Run</button>
+      </div>
+    `).join('');
+    container.querySelectorAll('.mijsr-app-run').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.dataset.url;
+        const name = btn.dataset.app;
+        const app = appsList.find(a => a.name === name);
+        if (app) showApprovalModal(app);
+      });
+    });
+  }
+
   function showApprovalModal(app) {
     const modal = document.getElementById('mijsrModal');
     const content = document.getElementById('mijsrModalContent');
@@ -156,18 +206,21 @@
 
     content.innerHTML = `
       <div class="mijsr-modal-header">
-        <span class="mijsr-modal-title">🔐 Approve App</span>
-        <button class="mijsr-modal-close" id="mijsrModalClose">✕</button>
+        <div class="mijsr-modal-lock">
+          <i class="fa-solid fa-lock"></i>
+          <span class="mijsr-modal-title">Approve App</span>
+        </div>
+        <button class="mijsr-modal-close" id="mijsrModalClose">${icon('fa-xmark', '')}</button>
       </div>
       <div class="mijsr-modal-body">
-        <p><strong>${escapeHtml(app.name)}</strong> (v${escapeHtml(app.version || '1.0')})</p>
-        <p class="mijsr-modal-desc">${escapeHtml(app.description || 'No description provided.')}</p>
+        <p style="margin-bottom: 10px"><strong>${escapeHtml(app.name)}</strong> (v${escapeHtml(app.version || '1.0')})</p>
+        <p class="mijsr-modal-desc" style="margin-bottom: 10px">${escapeHtml(app.description || 'No description provided.')}</p>
         <p class="mijsr-modal-meta">Author: ${escapeHtml(app.author || 'unknown')}</p>
-        <p class="mijsr-modal-warning">⚠️ This app will run arbitrary JavaScript. Only approve if you trust the source.</p>
+        <div class="mijsr-modal-warning"><i class="fa-solid fa-triangle-exclamation"></i> This app will run arbitrary JavaScript. Only approve if you trust the source.</div>
       </div>
       <div class="mijsr-modal-footer">
-        <button class="mijsr-btn-secondary" id="mijsrModalCancel">Cancel</button>
-        <button class="mijsr-btn-primary" id="mijsrModalApprove">✅ Approve & Run</button>
+        <button class="mijsr-btn-cancel" id="mijsrModalCancel">Cancel</button>
+        <button class="mijsr-btn-approve" id="mijsrModalApprove"><i class="fa-solid fa-check"></i> Approve & Run</button>
       </div>
     `;
 
@@ -197,10 +250,11 @@
       } else {
         // Normalize path to avoid duplicate /apps/apps/... when app.url already contains 'apps/'
         const path = url.replace(/^\/+/, '');
+        const mainBase = 'https://cdn.jsdelivr.net/gh/yxorp69/MIJSRv2@main';
         if (path.startsWith('apps/')) {
-          fullUrl = `${CONFIG.cdnBase}/${path}`;
+          fullUrl = `${mainBase}/${path}`;
         } else {
-          fullUrl = `${CONFIG.cdnBase}/apps/${path}`;
+          fullUrl = `${mainBase}/apps/${path}`;
         }
       }
 
@@ -219,12 +273,12 @@
     if (!container) return;
     container.innerHTML = `
       <div class="mijsr-setting-group">
-        <label for="mijsrKeybind">Keyboard shortcut</label>
-        <input type="text" id="mijsrKeybind" value="${state.keybind}" placeholder="e.g. Ctrl+Shift+M" />
+        <label for="mijsrKeybind"><i class="fa-solid fa-keyboard"></i> Keyboard shortcut</label>
+        <input type="text" id="mijsrKeybind" class="mijsr-shortcut-input" value="${state.keybind}" placeholder="e.g. Ctrl+Shift+M" />
         <p class="mijsr-hint">Press the keys you want, or type them manually.</p>
       </div>
       <div class="mijsr-setting-group">
-        <button class="mijsr-btn-danger" id="mijsrDestroy">💣 Destroy MIJSR</button>
+        <button class="mijsr-btn-danger" id="mijsrDestroy"><i class="fa-solid fa-trash-can"></i> Destroy MIJSR</button>
         <p class="mijsr-hint">Removes the sidebar and clears all data.</p>
       </div>
     `;
@@ -317,39 +371,44 @@
     sidebar.id = 'mijsrSidebar';
     sidebar.style.display = 'none';
 
-    resizeHandle = document.createElement('div');
-    resizeHandle.className = 'mijsr-resize-handle';
-    sidebar.appendChild(resizeHandle);
+
 
     sidebar.innerHTML += `
       <div class="mijsr-header">
-        <span class="mijsr-title">📦 MIJSR</span>
-        <button class="mijsr-close-btn" id="mijsrToggle">✕</button>
+        <span class="mijsr-title">${icon('fa-box', '')} MIJSR</span>
+        <button class="mijsr-close-btn" id="mijsrToggle">${icon('fa-xmark', '')}</button>
       </div>
       <div class="mijsr-tabs">
-        <button class="mijsr-tab-btn active" data-tab="code">${icon('fa-code', '✏️')} Code</button>
-        <button class="mijsr-tab-btn" data-tab="apps">${icon('fa-th-large', '📱')} Apps</button>
-        <button class="mijsr-tab-btn" data-tab="console">${icon('fa-terminal', '📋')} Console</button>
-        <button class="mijsr-tab-btn" data-tab="settings">${icon('fa-cog', '⚙️')} Settings</button>
+        <button class="mijsr-tab-btn active" data-tab="code">${icon('fa-code', '')} Code</button>
+        <button class="mijsr-tab-btn" data-tab="apps">${icon('fa-th-large', '')} Apps</button>
+        <button class="mijsr-tab-btn" data-tab="console">${icon('fa-terminal', '')} Console</button>
+        <button class="mijsr-tab-btn" data-tab="settings">${icon('fa-cog', '')} Settings</button>
       </div>
       <div class="mijsr-panels">
         <div id="mijsrPanelCode" class="mijsr-panel">
-          <div class="mijsr-panel-header">✏️ Code Editor</div>
+          <div class="mijsr-panel-header">${icon('fa-code', '')} Code Editor</div>
           <textarea id="mijsrCodeInput" placeholder="// Write your JavaScript here…" spellcheck="false"></textarea>
           <div class="mijsr-code-actions">
-            <button id="mijsrRunCode">▶️ Run</button>
-            <button id="mijsrImportCode">📂 Import</button>
-            <button id="mijsrExportCode">💾 Export</button>
+            <button id="mijsrRunCode">${icon('fa-play', '')} Run</button>
+            <button id="mijsrImportCode">${icon('fa-folder-open', '')} Import</button>
+            <button id="mijsrExportCode">${icon('fa-floppy-disk', '')} Export</button>
           </div>
           <div id="mijsrCodeOutput" class="mijsr-code-output"></div>
         </div>
         <div id="mijsrPanelApps" class="mijsr-panel" style="display:none;">
-          <div class="mijsr-panel-header">📱 Apps</div>
+          <div class="mijsr-panel-header">
+            <div class="mijsr-panel-header-left">
+              ${icon('fa-th-large', '')} <span>Apps</span>
+            </div>
+            <div class="mijsr-search-container">
+              <input type="text" id="mijsrAppSearch" class="mijsr-shortcut-input" placeholder="Search apps…">
+            </div>
+          </div>
           <div id="mijsrAppsContainer"><p class="mijsr-muted">Loading apps…</p></div>
         </div>
         <div id="mijsrPanelConsole" class="mijsr-panel" style="display:none;">
           <div class="mijsr-panel-header">
-            <span>📋 Console</span>
+            <span>${icon('fa-terminal', '')} Console</span>
             <div>
               <select id="mijsrConsoleFilter">
                 <option value="all">All</option>
@@ -357,13 +416,13 @@
                 <option value="warn">Warn</option>
                 <option value="error">Error</option>
               </select>
-              <button id="mijsrClearConsole">🗑️ Clear</button>
+              <button id="mijsrClearConsole">${icon('fa-trash', '')} Clear</button>
             </div>
           </div>
           <div id="mijsrConsoleContainer" class="mijsr-console-container"></div>
         </div>
         <div id="mijsrPanelSettings" class="mijsr-panel" style="display:none;">
-          <div class="mijsr-panel-header">⚙️ Settings</div>
+          <div class="mijsr-settings-header"><i class="fa-solid fa-gear"></i><span>Settings</span></div>
           <div id="mijsrSettingsContainer"></div>
         </div>
       </div>
@@ -446,30 +505,20 @@
       renderConsole();
     });
 
-    let isResizing = false;
-    resizeHandle.addEventListener('mousedown', (e) => {
-      isResizing = true;
-      document.addEventListener('mousemove', onResize);
-      document.addEventListener('mouseup', () => {
-        isResizing = false;
-        document.removeEventListener('mousemove', onResize);
-      });
-    });
-    function onResize(e) {
-      if (!isResizing) return;
-      let newWidth = e.clientX - sidebar.getBoundingClientRect().left;
-      newWidth = Math.min(Math.max(newWidth, 250), 800);
-      state.width = newWidth;
-      saveState();
-      sidebar.style.width = newWidth + 'px';
-    }
-
     hookConsole();
     setupKeyListener();
     fetchApps();
     renderSidebar();
 
-    window.MIJSR = { state, renderSidebar, addConsoleLog };
+    // Add event listener for search input
+    const searchInput = document.getElementById('mijsrAppSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchApps(e.target.value);
+      });
+    }
+
+    window.MIJSR = { state, renderSidebar, addConsoleLog, searchApps };
     addConsoleLog(`🚀 MIJSR v${CONFIG.version} loaded`, 'log');
     addConsoleLog(`💡 Press ${state.keybind} to toggle sidebar`, 'log');
   }
