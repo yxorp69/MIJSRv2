@@ -51,7 +51,6 @@ document.body.appendChild(s);
 ```
 > [!NOTE]
 > The CDN may take a few minutes to reflect the latest version after a release.
-> To use the latest dev version, replace `@latest` with `@main`.
 
 ---
 
